@@ -57,6 +57,8 @@ export default {
     
     if (savedPage) {
       this.currentPage = savedPage;
+      // Notify parent component about the restored page
+      this.$emit('page-change', savedPage);
     }
     
     // Add mouse event listeners

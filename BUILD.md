@@ -116,3 +116,28 @@ package.json            # Dependencies and scripts
 7. If authenticated, displays welcome page
 8. If not authenticated, redirects back to `/login`
 9. User can click Logout button to clear session and go back to login
+
+## Docker Development
+
+For containerized development and deployment, see [DOCKER.md](DOCKER.md).
+
+**Quick start with Docker:**
+```bash
+# Using docker-compose
+docker-compose up --build
+
+# Or using the helper script
+.\docker-run.ps1 up
+
+# Access the app at http://localhost:3000
+```
+
+**Available commands:**
+```bash
+.\docker-run.ps1 up       # Start application
+.\docker-run.ps1 down     # Stop application
+.\docker-run.ps1 logs     # View logs
+.\docker-run.ps1 restart  # Restart application
+.\docker-run.ps1 clean    # Remove all containers and volumes
+```
+

@@ -33,3 +33,9 @@ Thumbs.db
 
 # Project specific
 session-store.json
+
+# E2E Tests
+e2e/test-results/
+e2e/playwright-report/
+e2e/playwright/.cache/
+e2e/.env.test

@@ -3,7 +3,7 @@
  * Tests feature list management
  */
 
-const userFeaturesService = require('../src/services/userFeaturesService');
+const userFeaturesService = require('../../src/services/userFeaturesService');
 
 describe('UserFeaturesService', () => {
   describe('getAllFeatures', () => {

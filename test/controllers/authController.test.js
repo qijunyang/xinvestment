@@ -3,7 +3,7 @@
  * Tests authentication logic
  */
 
-const authController = require('../src/controllers/authController');
+const authController = require('../../src/controllers/authController');
 
 describe('AuthController', () => {
   let mockReq, mockRes;

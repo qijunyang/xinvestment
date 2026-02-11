@@ -45,27 +45,5 @@ module.exports = [
   // Login bundle
   createBundleConfig('login', './src/client/login/login.js'),
   // Home bundle
-  createBundleConfig('home', './src/client/home/home.js'),
-  // Todos bundle (with devServer config)
-  {
-    ...createBundleConfig('todos', './src/client/todos/todos.js'),
-    devServer: {
-      port: 8080,
-      hot: true,
-      proxy: [
-        {
-          context: ['/api'],
-          target: 'http://localhost:3000',
-          changeOrigin: true
-        }
-      ],
-      historyApiFallback: true,
-      client: {
-        overlay: {
-          errors: true,
-          warnings: false
-        }
-      }
-    }
-  }
+  createBundleConfig('home', './src/client/home/home.js')
 ];

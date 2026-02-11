@@ -1,8 +1,8 @@
 const express = require('express');
 const path = require('path');
-const todoRoutes = require('./routes/todoRoutes');
 const authRoutes = require('./routes/authRoutes');
 const userFeaturesRoutes = require('./routes/userFeaturesRoutes');
+const householdRoutes = require('./routes/householdRoutes');
 const { initializeApp } = require('./init');
 const sessionMiddleware = require('./middleware/sessionMiddleware');
 
@@ -29,8 +29,8 @@ async function startServer() {
     // User Features routes (public)
     app.use('/api/features', userFeaturesRoutes);
     
-    // Todo routes (protected with auth)
-    app.use('/api/todos', todoRoutes);
+    // Household routes (protected with auth)
+    app.use('/api/households', householdRoutes);
 
     // Health check endpoint (no auth required)
     app.get('/api/health', (req, res) => {

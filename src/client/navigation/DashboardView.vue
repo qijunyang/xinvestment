@@ -14,14 +14,6 @@
       <p>Session is active and you are authenticated.</p>
     </div>
 
-    <div class="info-card">
-      <h3>Quick Links</h3>
-      <ul>
-        <li><a href="javascript:void(0)" @click.prevent="$emit('navigate', 'dashboard')">Dashboard</a></li>
-        <li><a href="javascript:void(0)" @click.prevent="$emit('navigate', 'todos')">Todos</a></li>
-        <li><a href="/api/health" target="_blank">Check Server Health</a></li>
-      </ul>
-    </div>
   </div>
 </template>
 
@@ -113,8 +105,7 @@ export default {
   padding: 0 20px;
 }
 
-.welcome-card,
-.info-card {
+.welcome-card {
   background: white;
   border-radius: 8px;
   padding: 30px;
@@ -133,31 +124,6 @@ export default {
   line-height: 1.6;
 }
 
-.info-card h3 {
-  color: #333;
-  margin-bottom: 15px;
-}
-
-.info-card ul {
-  list-style: none;
-  padding: 0;
-}
-
-.info-card li {
-  margin: 10px 0;
-}
-
-.info-card a {
-  color: #667eea;
-  text-decoration: none;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.info-card a:hover {
-  color: #764ba2;
-  text-decoration: underline;
-}
 
 @media (max-width: 768px) {
   .navbar {
@@ -171,8 +137,7 @@ export default {
     justify-content: space-between;
   }
 
-  .welcome-card,
-  .info-card {
+  .welcome-card {
     padding: 20px;
   }
 }
