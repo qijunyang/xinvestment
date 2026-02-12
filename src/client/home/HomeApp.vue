@@ -11,16 +11,16 @@
 import axios from 'axios';
 import AppLayout from '../navigation/AppLayout.vue';
 import DashboardView from '../navigation/DashboardView.vue';
-import TodosView from '../navigation/TodosView.vue';
 import HealthCheckView from '../navigation/HealthCheckView.vue';
+import HouseholdView from '../navigation/HouseholdView.vue';
 
 export default {
   name: 'HomeApp',
   components: {
     AppLayout,
     DashboardView,
-    TodosView,
-    HealthCheckView
+    HealthCheckView,
+    HouseholdView
   },
   data() {
     return {
@@ -32,7 +32,7 @@ export default {
     currentComponent() {
       const components = {
         dashboard: 'DashboardView',
-        todos: 'TodosView',
+        household: 'HouseholdView',
         'health-check': 'HealthCheckView'
       };
       return components[this.currentPage] || 'DashboardView';
@@ -49,12 +49,12 @@ export default {
         });
 
         if (!response.ok && response.status !== 200) {
-          window.location.href = '/login';
+          window.location.href = '/login/index.html';
           return;
         }
       } catch (error) {
         console.error('Error checking authentication:', error);
-        window.location.href = '/login';
+        window.location.href = '/login/index.html';
       } finally {
         this.isLoading = false;
       }

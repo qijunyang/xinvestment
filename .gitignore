@@ -1,8 +1,11 @@
 # Dependencies
 node_modules/
 npm-debug.log
+npm-debug.log*
 yarn-error.log
 yarn-debug.log
+yarn*.log
+pnpm-lock.yaml
 
 # Environment variables
 .env
@@ -21,7 +24,8 @@ yarn-debug.log
 # Build and dist
 dist/
 build/
-src/client/dist/
+public/dist/
+public/
 
 # Logs
 logs/
@@ -33,3 +37,20 @@ Thumbs.db
 
 # Project specific
 session-store.json
+
+# Terraform
+deploy/terraform/.terraform/
+deploy/terraform/.terraform.lock.hcl
+deploy/terraform/terraform.tfstate
+deploy/terraform/terraform.tfstate.*
+deploy/terraform/tfplan
+deploy/terraform/plan.txt
+deploy/terraform/apply.log
+
+# E2E Tests
+e2e/test-results/
+e2e/playwright-report/
+e2e/playwright/.cache/
+e2e/.env.test
+test-results/
+playwright-report/

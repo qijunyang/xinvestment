@@ -18,11 +18,25 @@ class UserFeaturesService {
         description: 'View your investment dashboard'
       },
       {
-        id: 'todos',
-        title: 'Todos',
-        icon: '✓',
-        action: 'todos',
-        description: 'Manage your tasks and todos'
+        id: 'household',
+        title: 'Household',
+        icon: '👨‍👩‍👧‍👦',
+        action: 'household',
+        description: 'Manage household information'
+      },
+      {
+        id: 'client',
+        title: 'Client',
+        icon: '👤',
+        action: 'client',
+        description: 'Client management (coming soon)'
+      },
+      {
+        id: 'account',
+        title: 'Account',
+        icon: '🧾',
+        action: 'account',
+        description: 'Account management (coming soon)'
       },
       {
         id: 'health-check',

@@ -10,7 +10,9 @@ module.exports = {
       autoDiscovery: true  // Enable for automatic node discovery on scaling
     }
   },
-  env: 'dr',
+    env: {
+      app_env: 'dr'
+    },
   port: 3001,
   database: {
     host: 'dr-db.example.com',

@@ -10,7 +10,9 @@ module.exports = {
       autoDiscovery: true  // Enable for automatic node discovery on scaling
     }
   },
-  env: 'prd',
+  env: {
+    app_env: 'prd'
+  },
   port: 3001,
   database: {
     host: 'prd-db.example.com',

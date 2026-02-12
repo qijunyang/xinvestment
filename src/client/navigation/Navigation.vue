@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import featureDataService from '../data/featureDataService';
 
 export default {
   name: 'Navigation',
@@ -68,13 +68,7 @@ export default {
         this.isLoading = true;
         this.error = null;
 
-        const response = await axios.get('/api/features', {
-          withCredentials: true
-        });
-
-        if (response.data && response.data.data) {
-          this.features = response.data.data;
-        }
+        this.features = await featureDataService.getAllFeatures();
       } catch (error) {
         console.error('Error loading features:', error);
         this.error = error.message;
@@ -82,7 +76,6 @@ export default {
         // Fallback to default features if API fails
         this.features = [
           { id: 'dashboard', title: 'Dashboard', icon: '🏠', action: 'dashboard' },
-          { id: 'todos', title: 'Todos', icon: '✓', action: 'todos' },
           { id: 'health-check', title: 'Health Check', icon: '💚', action: 'health-check' }
         ];
         this.error = null; // Clear error since we have fallback
