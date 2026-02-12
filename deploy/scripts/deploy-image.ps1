@@ -1,7 +1,8 @@
 # PowerShell deployment script for building and pushing Docker images to ECR
-# Usage: .\deploy-image.ps1 -Environment <env> [-ImageTag <tag>]
-# Example: .\deploy-image.ps1 -Environment qa
-# Example: .\deploy-image.ps1 -Environment prd -ImageTag v1.2.3
+# MUST be run from the deploy/ folder
+# Usage: cd deploy && .\scripts\deploy-image.ps1 -Environment <env> [-ImageTag <tag>]
+# Example: cd deploy && .\scripts\deploy-image.ps1 -Environment qa
+# Example: cd deploy && .\scripts\deploy-image.ps1 -Environment prd -ImageTag v1.2.3
 
 param(
     [Parameter(Mandatory=$true)]
@@ -36,9 +37,41 @@ function Write-Warn-Custom {
 Write-Info "Environment: $Environment"
 Write-Info "Image Tag: $ImageTag"
 
+# Get the deploy folder (one level up from scripts folder)
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$DeployDir = Split-Path -Parent $ScriptDir
+$ProjectRoot = Split-Path -Parent $DeployDir
+
+$BranchName = "unknown"
+$Sequence = "0"
+
+try {
+    $BranchName = (git rev-parse --abbrev-ref HEAD).Trim()
+} catch {
+    $BranchName = "unknown"
+}
+
+try {
+    $Sequence = (git rev-list --count HEAD).Trim()
+} catch {
+    $Sequence = "0"
+}
+
+$BranchName = $BranchName -replace '/', '-'
+$BranchTag = "$BranchName-$Sequence"
+
+Write-Info "Branch Tag: $BranchTag"
+
+# Validate deploy folder structure exists
+if (-not (Test-Path "$DeployDir\terraform")) {
+    Write-Error-Custom "Expected deploy/terraform folder not found"
+    Write-Error-Custom "Please run from deploy folder: cd deploy && .\scripts\deploy-image.ps1 -Environment $Environment"
+    exit 1
+}
+
 # Read terraform variables
-$TerraformDir = Join-Path $PSScriptRoot "..\..\terraform"
-$TfvarsFile = Join-Path $TerraformDir "terraform-$Environment.tfvars"
+$TerraformDir = "$DeployDir\terraform"
+$TfvarsFile = "$TerraformDir\terraform-$Environment.tfvars"
 
 if (-not (Test-Path $TfvarsFile)) {
     Write-Error-Custom "Terraform variables file not found: $TfvarsFile"
@@ -57,13 +90,21 @@ if ([string]::IsNullOrEmpty($EcrRepo) -or [string]::IsNullOrEmpty($AwsRegion)) {
 Write-Info "ECR Repository: $EcrRepo"
 Write-Info "AWS Region: $AwsRegion"
 
-# Change to project root
-$ProjectRoot = Join-Path $PSScriptRoot "..\..\"
+# Change to project root for build/docker operations
 Set-Location $ProjectRoot
+
+# Build client assets locally first
+Write-Info "Building client assets locally..."
+npm run build
+if ($LASTEXITCODE -ne 0) {
+    Write-Error-Custom "Local asset build failed"
+    exit 1
+}
+Write-Info "Client assets built successfully"
 
 # Build Docker image
 Write-Info "Building Docker image..."
-docker build -t "xinvestment:$ImageTag" .
+docker build --no-cache -t "xinvestment:$ImageTag" .
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error-Custom "Docker build failed"
@@ -75,10 +116,12 @@ Write-Info "Docker image built successfully"
 # Tag image for ECR
 Write-Info "Tagging image for ECR..."
 docker tag "xinvestment:$ImageTag" "${EcrRepo}:$ImageTag"
+docker tag "xinvestment:$ImageTag" "${EcrRepo}:$BranchTag"
 
 # Login to ECR
 Write-Info "Logging in to ECR..."
-aws ecr get-login-password --region $AwsRegion | docker login --username AWS --password-stdin $EcrRepo
+$EcrRegistry = $EcrRepo.Split('/')[0]
+aws ecr get-login-password --region $AwsRegion | docker login --username AWS --password-stdin $EcrRegistry
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error-Custom "ECR login failed"
@@ -88,6 +131,7 @@ if ($LASTEXITCODE -ne 0) {
 # Push image to ECR
 Write-Info "Pushing image to ECR..."
 docker push "${EcrRepo}:$ImageTag"
+docker push "${EcrRepo}:$BranchTag"
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error-Custom "Docker push failed"
@@ -96,6 +140,7 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Info "Image pushed successfully!"
 Write-Info "Image: ${EcrRepo}:$ImageTag"
+Write-Info "Image: ${EcrRepo}:$BranchTag"
 
 # Update reminder
 if ($ImageTag -eq "$Environment-latest") {

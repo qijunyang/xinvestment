@@ -3,5 +3,5 @@
 
 bucket  = "xinvestment-terraform-state"
 key     = "qa/terraform.tfstate"
-region  = "us-east-1"
+region  = "us-east-2"
 encrypt = true

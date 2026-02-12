@@ -45,7 +45,9 @@ if [[ ! "$ENVIRONMENT" =~ ^(dev|qa|uat|stg|prd)$ ]]; then
 fi
 
 # Read AWS region and ECR repository URL from terraform variables
-TERRAFORM_DIR="$(dirname "$0")/../terraform"
+SCRIPT_DIR="$(dirname "$0")"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+TERRAFORM_DIR="$PROJECT_ROOT/deploy/terraform"
 TFVARS_FILE="$TERRAFORM_DIR/terraform-${ENVIRONMENT}.tfvars"
 
 if [ ! -f "$TFVARS_FILE" ]; then
@@ -65,14 +67,25 @@ fi
 info "Environment: $ENVIRONMENT"
 info "ECR Repository: $ECR_REPO"
 info "AWS Region: $AWS_REGION"
+BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+BRANCH_NAME=${BRANCH_NAME//\//-}
+SEQUENCE=$(git rev-list --count HEAD 2>/dev/null || echo "0")
+BRANCH_TAG="${BRANCH_NAME}-${SEQUENCE}"
+
 info "Image Tag: $IMAGE_TAG"
+info "Branch Tag: $BRANCH_TAG"
 
 # Change to project root
-cd "$(dirname "$0")/.."
+cd "$PROJECT_ROOT"
+
+# Build client assets locally first
+info "Building client assets locally..."
+npm run build
+info "Client assets built successfully"
 
 # Build Docker image
 info "Building Docker image..."
-docker build -t xinvestment:${IMAGE_TAG} .
+docker build --no-cache -t xinvestment:${IMAGE_TAG} .
 
 if [ $? -ne 0 ]; then
     error "Docker build failed"
@@ -84,11 +97,13 @@ info "Docker image built successfully"
 # Tag image for ECR
 info "Tagging image for ECR..."
 docker tag xinvestment:${IMAGE_TAG} ${ECR_REPO}:${IMAGE_TAG}
+docker tag xinvestment:${IMAGE_TAG} ${ECR_REPO}:${BRANCH_TAG}
 
 # Login to ECR
 info "Logging in to ECR..."
+ECR_REGISTRY="${ECR_REPO%%/*}"
 aws ecr get-login-password --region ${AWS_REGION} | \
-    docker login --username AWS --password-stdin ${ECR_REPO}
+    docker login --username AWS --password-stdin ${ECR_REGISTRY}
 
 if [ $? -ne 0 ]; then
     error "ECR login failed"
@@ -98,6 +113,7 @@ fi
 # Push image to ECR
 info "Pushing image to ECR..."
 docker push ${ECR_REPO}:${IMAGE_TAG}
+docker push ${ECR_REPO}:${BRANCH_TAG}
 
 if [ $? -ne 0 ]; then
     error "Docker push failed"
@@ -106,6 +122,7 @@ fi
 
 info "Image pushed successfully!"
 info "Image: ${ECR_REPO}:${IMAGE_TAG}"
+info "Image: ${ECR_REPO}:${BRANCH_TAG}"
 
 # Update the image_tag in tfvars if using environment-latest tag
 if [ "$IMAGE_TAG" == "${ENVIRONMENT}-latest" ]; then

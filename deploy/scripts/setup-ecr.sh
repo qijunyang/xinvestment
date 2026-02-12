@@ -6,7 +6,7 @@
 
 set -e
 
-REGION=${1:-us-east-1}
+REGION=${1:-us-east-2}
 REPOSITORY_NAME="xinvestment"
 
 echo -e "\033[0;32mCreating ECR repository...\033[0m"

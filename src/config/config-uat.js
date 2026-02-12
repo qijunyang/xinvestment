@@ -10,7 +10,9 @@ module.exports = {
       autoDiscovery: true  // Enable for automatic node discovery on scaling
     }
   },
-  env: 'uat',
+    env: {
+      app_env: 'uat'
+    },
   port: 3001,
   database: {
     host: 'uat-db.example.com',

@@ -48,7 +48,8 @@ Edit the appropriate `terraform-<env>.tfvars` file with your actual values:
 
 - `vpc_id`: Your VPC ID
 - `domain_name`: Your domain name
-- `route53_zone_name`: Your Route53 hosted zone name
+- `route53_zone_name`: Your Route53 hosted zone name (optional if using ID)
+- `route53_zone_id`: Your Route53 hosted zone ID (optional, overrides name lookup)
 - `ecr_repository_url`: Your ECR repository URL
 - `aws_region`: Region for S3 origin + ALB + ECS + WAF + ALB ACM cert
 

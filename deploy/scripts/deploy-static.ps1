@@ -1,6 +1,7 @@
 # PowerShell script to deploy static assets to S3 and invalidate CloudFront
-# Usage: .\deploy-static.ps1 -Environment <env>
-# Example: .\deploy-static.ps1 -Environment qa
+# MUST be run from the deploy/ folder
+# Usage: cd deploy && .\scripts\deploy-static.ps1 -Environment <env>
+# Example: cd deploy && .\scripts\deploy-static.ps1 -Environment qa
 
 param(
     [Parameter(Mandatory=$true)]
@@ -26,18 +27,28 @@ function Write-Warn-Custom {
 
 Write-Info "Deploying static assets for environment: $Environment"
 
-# Change to project root
-$ProjectRoot = Join-Path $PSScriptRoot "..\..\"
-Set-Location $ProjectRoot
+# Get the deploy folder (one level up from scripts folder)
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$DeployDir = Split-Path -Parent $ScriptDir
+$ProjectRoot = Split-Path -Parent $DeployDir
 
-# Check if dist folder exists
-if (-not (Test-Path "dist")) {
-    Write-Error-Custom "dist folder not found. Please run 'npm run build' first."
+# Validate deploy folder structure
+if (-not (Test-Path "$DeployDir\terraform")) {
+    Write-Error-Custom "Expected deploy/terraform folder not found"
+    Write-Error-Custom "Please run from deploy folder: cd deploy && .\scripts\deploy-static.ps1 -Environment $Environment"
+    exit 1
+}
+
+# Check if dist folder exists (webpack outputs to src/client/dist)
+$DistFolder = "$ProjectRoot\src\client\dist"
+if (-not (Test-Path $DistFolder)) {
+    Write-Error-Custom "dist folder not found at: $DistFolder"
+    Write-Error-Custom "Please run 'npm run build' from project root first."
     exit 1
 }
 
 # Get S3 bucket and CloudFront distribution ID from Terraform output
-$TerraformDir = Join-Path $ProjectRoot "deploy\terraform"
+$TerraformDir = "$DeployDir\terraform"
 Set-Location $TerraformDir
 
 Write-Info "Getting infrastructure info from Terraform..."
@@ -66,7 +77,7 @@ Set-Location $ProjectRoot
 
 # Sync dist folder to S3
 Write-Info "Uploading static assets to S3..."
-aws s3 sync dist/ "s3://$S3Bucket/" `
+aws s3 sync "$DistFolder/" "s3://$S3Bucket/" `
     --delete `
     --cache-control "public,max-age=31536000,immutable" `
     --exclude "*.html" `
@@ -79,7 +90,7 @@ if ($LASTEXITCODE -ne 0) {
 
 # Upload HTML files with shorter cache duration
 Write-Info "Uploading HTML files with shorter cache..."
-aws s3 sync dist/ "s3://$S3Bucket/" `
+aws s3 sync "$DistFolder/" "s3://$S3Bucket/" `
     --exclude "*" `
     --include "*.html" `
     --cache-control "public,max-age=300"

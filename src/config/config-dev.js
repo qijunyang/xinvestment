@@ -1,5 +1,7 @@
 module.exports = {
-  env: 'dev',
+  env: {
+    app_env: 'dev'
+  },
   port: 3000,
   database: {
     host: 'localhost',

@@ -1,10 +1,11 @@
 # PowerShell script to create ECR repository
+# MUST be run from the deploy/ folder or called from deploy-pipeline.ps1
 # This only needs to be run once
-# Usage: .\setup-ecr.ps1 [-Region <region>]
+# Usage: cd deploy && .\scripts\setup-ecr.ps1 [-Region <region>]
 
 param(
     [Parameter(Mandatory=$false)]
-    [string]$Region = "us-east-1"
+    [string]$Region = "us-east-2"
 )
 
 $RepositoryName = "xinvestment"
@@ -21,8 +22,9 @@ aws ecr create-repository `
     --encryption-configuration encryptionType=AES256 `
     --region $Region
 
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "✓ ECR repository created successfully" -ForegroundColor Green
+if ($LASTEXITCODE -eq 0)
+{
+    Write-Host "ECR repository created successfully" -ForegroundColor Green
     
     # Get repository URI
     $RepoUri = (aws ecr describe-repositories `
@@ -60,17 +62,24 @@ if ($LASTEXITCODE -eq 0) {
 }
 '@
     
-    $LifecyclePolicy | aws ecr put-lifecycle-policy `
+    $TempFile = [System.IO.Path]::GetTempFileName()
+    $LifecyclePolicy | Out-File -FilePath $TempFile -Encoding utf8
+    
+    aws ecr put-lifecycle-policy `
         --repository-name $RepositoryName `
-        --lifecycle-policy-text file:///dev/stdin `
+        --lifecycle-policy-text "file://$TempFile" `
         --region $Region
     
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "✓ Lifecycle policy set" -ForegroundColor Green
-    }
+    Remove-Item $TempFile -ErrorAction SilentlyContinue
     
-} else {
-    Write-Host "✗ Failed to create ECR repository (it may already exist)" -ForegroundColor Yellow
+    if ($LASTEXITCODE -eq 0)
+    {
+        Write-Host "Lifecycle policy set" -ForegroundColor Green
+    }
+}
+else
+{
+    Write-Host "Failed to create ECR repository (it may already exist)" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "To get existing repository URI:" -ForegroundColor Cyan
     Write-Host "  aws ecr describe-repositories --repository-names $RepositoryName --region $Region" -ForegroundColor White

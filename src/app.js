@@ -34,7 +34,8 @@ async function startServer() {
 
     // Health check endpoint (no auth required)
     app.get('/api/health', (req, res) => {
-      res.status(200).json({ status: 'OK', message: 'Server is running', env: config.env });
+      const appEnv = config.env?.app_env || config.env || 'dev';
+      res.status(200).json({ status: 'OK', message: 'Server is running', env: appEnv });
     });
 
     // Serve login page at root and /login
@@ -64,8 +65,9 @@ async function startServer() {
 
     const PORT = config.port || process.env.PORT || 3000;
     app.listen(PORT, () => {
-      console.log(`✓ Server is running on port ${PORT} (Environment: ${config.env})`);
-      console.log(`✓ Session cookie name: xinvestment-session-${config.env}`);
+      const appEnv = config.env?.app_env || config.env || 'dev';
+      console.log(`✓ Server is running on port ${PORT} (Environment: ${appEnv})`);
+      console.log(`✓ Session cookie name: xinvestment-session-${appEnv}`);
       console.log(`✓ Login page: http://localhost:${PORT}/login/`);
     });
   } catch (error) {

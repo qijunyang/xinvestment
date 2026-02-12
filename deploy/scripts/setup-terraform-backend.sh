@@ -7,7 +7,7 @@
 set -e
 
 BUCKET_NAME="xinvestment-terraform-state"
-REGION="us-east-1"
+REGION="us-east-2"
 
 echo -e "\033[0;32mSetting up Terraform backend S3 bucket...\033[0m"
 echo -e "\033[0;36mBucket: $BUCKET_NAME\033[0m"
@@ -29,7 +29,11 @@ if aws s3 mb "s3://$BUCKET_NAME" --region "$REGION"; then
         echo -e "\033[0;31m✗ Failed to enable versioning\033[0m"
     fi
 else
-    echo -e "\033[0;33m✗ Failed to create S3 bucket (it may already exist)\033[0m"
+    echo -e "\033[0;33mS3 bucket already exists (OK)\033[0m"
+    echo -e "\033[0;33mEnsuring versioning is enabled...\033[0m"
+    aws s3api put-bucket-versioning \
+        --bucket "$BUCKET_NAME" \
+        --versioning-configuration Status=Enabled >/dev/null 2>&1
 fi
 
 echo ""

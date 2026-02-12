@@ -1,9 +1,10 @@
 # PowerShell script to create Terraform backend S3 bucket
+# MUST be run from the deploy/ folder or called from deploy-pipeline.ps1
 # This only needs to be run once
-# Usage: .\setup-terraform-backend.ps1
+# Usage: cd deploy && .\scripts\setup-terraform-backend.ps1
 
 $BucketName = "xinvestment-terraform-state"
-$Region = "us-east-1"
+$Region = "us-east-2"
 
 Write-Host "Setting up Terraform backend S3 bucket..." -ForegroundColor Green
 Write-Host "Bucket: $BucketName" -ForegroundColor Cyan
@@ -14,20 +15,30 @@ Write-Host ""
 Write-Host "Creating S3 bucket..." -ForegroundColor Yellow
 aws s3 mb "s3://$BucketName" --region $Region
 
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "✓ S3 bucket created successfully" -ForegroundColor Green
+if ($LASTEXITCODE -eq 0)
+{
+    Write-Host "S3 bucket created successfully" -ForegroundColor Green
     
     # Enable versioning
     Write-Host "Enabling versioning on S3 bucket..." -ForegroundColor Yellow
     aws s3api put-bucket-versioning --bucket $BucketName --versioning-configuration Status=Enabled
     
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "✓ Versioning enabled" -ForegroundColor Green
-    } else {
-        Write-Host "✗ Failed to enable versioning" -ForegroundColor Red
+    if ($LASTEXITCODE -eq 0)
+    {
+        Write-Host "Versioning enabled" -ForegroundColor Green
     }
-} else {
-    Write-Host "✗ Failed to create S3 bucket (it may already exist)" -ForegroundColor Yellow
+    else
+    {
+        Write-Host "Failed to enable versioning" -ForegroundColor Red
+    }
+}
+else
+{
+    Write-Host "S3 bucket already exists (OK)" -ForegroundColor Yellow
+    
+    # Try to enable versioning anyway in case it wasn't set
+    Write-Host "Ensuring versioning is enabled..." -ForegroundColor Yellow
+    aws s3api put-bucket-versioning --bucket $BucketName --versioning-configuration Status=Enabled 2>$null
 }
 
 Write-Host ""

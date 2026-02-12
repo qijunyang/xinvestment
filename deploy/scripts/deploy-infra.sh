@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Bash deploy pipeline script
-# Usage: ./deploy-pipeline.sh <environment>
-# Example: ./deploy-pipeline.sh qa
+# Bash infrastructure deploy pipeline script
+# Usage: ./deploy-infra.sh <environment>
+# Example: ./deploy-infra.sh qa
 
 set -e
 
@@ -39,7 +39,7 @@ TERRAFORM_DIR="$PROJECT_ROOT/deploy/terraform"
 BACKEND_CONFIG="$TERRAFORM_DIR/backend-$ENVIRONMENT.hcl"
 VAR_FILE="$TERRAFORM_DIR/terraform-$ENVIRONMENT.tfvars"
 
-info "Deploy pipeline starting for environment: $ENVIRONMENT"
+info "Infra deploy pipeline starting for environment: $ENVIRONMENT"
 echo ""
 
 # Step 1: Ensure Terraform backend S3 bucket exists
@@ -61,33 +61,22 @@ fi
 
 "$SCRIPT_DIR/setup-ecr.sh" "$AWS_REGION"
 
-# Step 3: Build and push API image
-info "Step 3: Build and push API image"
-"$SCRIPT_DIR/deploy-image.sh" "$ENVIRONMENT"
-
-# Step 4: Terraform apply (infra)
-info "Step 4: Deploy infrastructure with Terraform"
+# Step 3: Terraform apply (infra)
+info "Step 3: Deploy infrastructure with Terraform"
 if [ ! -f "$BACKEND_CONFIG" ]; then
     error "Backend config not found: $BACKEND_CONFIG"
     exit 1
 fi
 
 cd "$TERRAFORM_DIR"
-terraform init -backend-config="$BACKEND_CONFIG"
-terraform apply -var-file="$VAR_FILE"
-
-# Step 5: Deploy static assets to S3/CloudFront
-info "Step 5: Deploy static assets to S3/CloudFront"
-cd "$PROJECT_ROOT"
-npm run build
-"$SCRIPT_DIR/deploy-static.sh" "$ENVIRONMENT"
+terraform init -reconfigure -backend-config="$BACKEND_CONFIG"
+terraform apply -auto-approve -var-file="$VAR_FILE"
 
 echo ""
-info "Deploy pipeline complete!"
-echo ""
+info "Infra deploy pipeline complete!"
 info "Get URLs with:"
 echo "  cd deploy/terraform"
 echo "  terraform output cdn_url"
 echo "  terraform output api_url"
 echo ""
-warn "TLS note: CloudFront custom cert must be in us-east-1; ALB cert is in backend_region."
+info "TLS note: CloudFront custom cert must be in us-east-1; ALB cert is in backend_region."

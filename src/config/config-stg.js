@@ -10,7 +10,9 @@ module.exports = {
       autoDiscovery: true  // Enable for automatic node discovery on scaling
     }
   },
-  env: 'stg',
+    env: {
+      app_env: 'stg'
+    },
   port: 3001,
   database: {
     host: 'stg-db.example.com',

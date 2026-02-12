@@ -3,11 +3,12 @@ const { loadConfig } = require('./config/configLoader');
 /**
  * Initialize application with loaded configuration
  * Must be called before starting the app to ensure all secrets are loaded
- * @param {string} env - The environment name (defaults to NODE_ENV or 'dev')
+ * @param {string} env - The environment name (defaults to APP_ENV or 'dev')
  * @returns {Promise<object>} - The initialized configuration object
  */
 async function initializeApp(env) {
-  const environment = env || process.env.NODE_ENV || 'dev';
+  const rawEnv = env || process.env.APP_ENV || 'dev';
+  const environment = String(rawEnv).toLowerCase();
   
   try {
     console.log('🚀 Initializing application...');

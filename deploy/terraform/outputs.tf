@@ -1,105 +1,95 @@
 output "alb_dns_name" {
-  description = "DNS name of the Application Load Balancer"
-  value       = aws_lb.main.dns_name
+  description = "DNS name of the Application Load Balancer (private - not directly accessible)"
+  value       = module.alb.alb_dns_name
 }
 
 output "alb_zone_id" {
   description = "Zone ID of the Application Load Balancer"
-  value       = aws_lb.main.zone_id
+  value       = module.alb.alb_zone_id
 }
 
 output "alb_arn" {
   description = "ARN of the Application Load Balancer"
-  value       = aws_lb.main.arn
-}
-
-output "ecs_cluster_name" {
-  description = "Name of the ECS cluster"
-  value       = aws_ecs_cluster.main.name
-}
-
-output "ecs_cluster_arn" {
-  description = "ARN of the ECS cluster"
-  value       = aws_ecs_cluster.main.arn
-}
-
-output "ecs_service_name" {
-  description = "Name of the ECS service"
-  value       = aws_ecs_service.app.name
-}
-
-output "ecs_task_definition_arn" {
-  description = "ARN of the ECS task definition"
-  value       = aws_ecs_task_definition.app.arn
-}
-
-output "cloudwatch_log_group_name" {
-  description = "Name of the CloudWatch log group"
-  value       = aws_cloudwatch_log_group.app.name
-}
-
-output "waf_web_acl_arn" {
-  description = "ARN of the WAF Web ACL"
-  value       = aws_wafv2_web_acl.main.arn
-}
-
-output "waf_web_acl_id" {
-  description = "ID of the WAF Web ACL"
-  value       = aws_wafv2_web_acl.main.id
-}
-
-output "application_url" {
-  description = "Application URL"
-  value       = "https://${var.domain_name}"
-}
-
-output "acm_certificate_arn" {
-  description = "ARN of the ACM certificate"
-  value       = aws_acm_certificate.alb.arn
-}
-
-output "ecs_security_group_id" {
-  description = "Security group ID for ECS tasks"
-  value       = aws_security_group.ecs_tasks.id
+  value       = module.alb.alb_arn
 }
 
 output "alb_security_group_id" {
   description = "Security group ID for ALB"
-  value       = aws_security_group.alb.id
+  value       = module.alb.alb_security_group_id
+}
+
+output "ecs_cluster_name" {
+  description = "Name of the ECS cluster"
+  value       = module.ecs_service.ecs_cluster_name
+}
+
+output "ecs_cluster_arn" {
+  description = "ARN of the ECS cluster"
+  value       = module.ecs_service.ecs_cluster_arn
+}
+
+output "ecs_service_name" {
+  description = "Name of the ECS service"
+  value       = module.ecs_service.ecs_service_name
+}
+
+output "ecs_task_definition_arn" {
+  description = "ARN of the ECS task definition"
+  value       = module.ecs_service.ecs_task_definition_arn
+}
+
+output "cloudwatch_log_group_name" {
+  description = "Name of the CloudWatch log group"
+  value       = module.ecs_service.cloudwatch_log_group_name
+}
+
+output "waf_web_acl_arn" {
+  description = "ARN of the WAF Web ACL"
+  value       = module.waf.web_acl_arn
+}
+
+output "waf_web_acl_id" {
+  description = "ID of the WAF Web ACL"
+  value       = module.waf.web_acl_id
+}
+
+output "ecs_security_group_id" {
+  description = "Security group ID for ECS tasks"
+  value       = module.ecs_service.ecs_security_group_id
 }
 
 output "s3_static_assets_bucket" {
   description = "S3 bucket name for static assets"
-  value       = aws_s3_bucket.static_assets.id
+  value       = module.static_cdn.s3_static_assets_bucket
 }
 
 output "s3_static_assets_bucket_arn" {
   description = "ARN of the S3 bucket for static assets"
-  value       = aws_s3_bucket.static_assets.arn
+  value       = module.static_cdn.s3_static_assets_bucket_arn
 }
 
 output "cloudfront_distribution_id" {
   description = "ID of the CloudFront distribution"
-  value       = aws_cloudfront_distribution.static_assets.id
+  value       = module.static_cdn.cloudfront_distribution_id
 }
 
 output "cloudfront_distribution_arn" {
   description = "ARN of the CloudFront distribution"
-  value       = aws_cloudfront_distribution.static_assets.arn
+  value       = module.static_cdn.cloudfront_distribution_arn
 }
 
 output "cloudfront_domain_name" {
-  description = "CloudFront distribution domain name"
-  value       = aws_cloudfront_distribution.static_assets.domain_name
+  description = "CloudFront distribution domain name (use this to access the application)"
+  value       = module.static_cdn.cloudfront_domain_name
+}
+
+output "application_url" {
+  description = "Application URL (CloudFront - public access point)"
+  value       = module.static_cdn.cdn_url
 }
 
 output "cdn_url" {
   description = "CDN URL for static assets"
-  value       = length(var.cloudfront_aliases) > 0 ? "https://${var.cloudfront_aliases[0]}" : "https://${aws_cloudfront_distribution.static_assets.domain_name}"
-}
-
-output "api_url" {
-  description = "API base URL (ALB)"
-  value       = "https://${var.domain_name}"
+  value       = module.static_cdn.cdn_url
 }
 

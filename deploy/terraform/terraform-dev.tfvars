@@ -1,29 +1,30 @@
 # Dev Environment Configuration
 
-aws_region  = "us-east-1"
+aws_region  = "us-east-2"
 environment = "dev"
 
 # VPC Configuration (replace with actual VPC ID)
-vpc_id = "vpc-xxxxxxxxxxxxxxxxx"
+vpc_id = "vpc-0b7672e5281122ff8"
 
 # Domain Configuration (replace with actual domain)
-domain_name        = "xinvestment-dev.example.com"
-route53_zone_name  = "example.com"
+domain_name        = "xinvestment-dev.xinvestment.com"
+route53_zone_name  = "xinvestment.com"
+route53_zone_id    = "Z07223402FNDO6DI1G8NP"
 subject_alternative_names = []
 
 # ECS Configuration
 fargate_cpu    = "256"   # 0.25 vCPU
 fargate_memory = "512"   # 0.5 GB
-desired_count  = 1
-min_capacity   = 1
+desired_count  = 0
+min_capacity   = 0
 max_capacity   = 1
 
 # ECR Configuration (replace with actual ECR URL)
-ecr_repository_url = "123456789012.dkr.ecr.us-east-1.amazonaws.com/xinvestment"
+ecr_repository_url = "411119517943.dkr.ecr.us-east-2.amazonaws.com/xinvestment"
 image_tag          = "dev-latest"
 
 # Application Configuration
-node_env       = "development"
+node_env       = "dev"
 container_port = 3000
 
 # Infrastructure Configuration

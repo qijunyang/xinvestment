@@ -11,7 +11,8 @@ const sessionStore = require('./sessionStore');
  * - Configurable session store: memory (dev) or memcached (prod)
  */
 function sessionMiddleware(config) {
-  const sessionCookieName = `xinvestment-session-${config.env}`;
+  const appEnv = config.env?.app_env || 'dev';
+  const sessionCookieName = `xinvestment-session-${appEnv}`;
   
   // Session secret for signing cookies - should be unique and strong
   // In production, this should come from environment variables
@@ -73,7 +74,7 @@ function sessionMiddleware(config) {
       httpOnly: true,
       
       // Secure flag for HTTPS (enable in production)
-      secure: config.env === 'production',
+      secure: appEnv === 'prd' || appEnv === 'production',
       
       // SameSite protection against CSRF attacks
       sameSite: 'strict',

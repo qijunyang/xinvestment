@@ -1,4 +1,7 @@
 module.exports = {
+  env: {
+    app_env: process.env.APP_ENV || 'dev'
+  },
   port: 3000,
   database: {
     port: 27017

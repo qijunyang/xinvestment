@@ -1,5 +1,7 @@
 module.exports = {
-  env: 'qa',
+  env: {
+    app_env: 'qa'
+  },
   port: 3001,
   database: {
     host: 'qa-db.example.com',

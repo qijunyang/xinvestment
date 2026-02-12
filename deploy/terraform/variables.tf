@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS region for backend resources (ALB + ECS + WAF + S3 origin + ACM for ALB)"
   type        = string
-  default     = "us-east-1"
+  default     = "us-east-2"
 }
 
 variable "project_name" {
@@ -28,6 +28,12 @@ variable "domain_name" {
 variable "route53_zone_name" {
   description = "Route53 hosted zone name"
   type        = string
+}
+
+variable "route53_zone_id" {
+  description = "Route53 hosted zone ID (optional, overrides name lookup)"
+  type        = string
+  default     = ""
 }
 
 variable "subject_alternative_names" {

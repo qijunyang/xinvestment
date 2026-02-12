@@ -46,9 +46,10 @@ info "Deploying static assets for environment: $ENVIRONMENT"
 # Change to project root
 cd "$(dirname "$0")/../.."
 
-# Check if dist folder exists
-if [ ! -d "dist" ]; then
-    error "dist folder not found. Please run 'npm run build' first."
+# Check if dist folder exists (webpack outputs to src/client/dist)
+DIST_FOLDER="src/client/dist"
+if [ ! -d "$DIST_FOLDER" ]; then
+    error "dist folder not found at $DIST_FOLDER. Please run 'npm run build' first."
     exit 1
 fi
 
@@ -80,7 +81,7 @@ cd ../..
 
 # Sync dist folder to S3
 info "Uploading static assets to S3..."
-aws s3 sync dist/ "s3://$S3_BUCKET/" \
+aws s3 sync "$DIST_FOLDER/" "s3://$S3_BUCKET/" \
     --delete \
     --cache-control "public,max-age=31536000,immutable" \
     --exclude "*.html" \
@@ -93,7 +94,7 @@ fi
 
 # Upload HTML files with shorter cache duration
 info "Uploading HTML files with shorter cache..."
-aws s3 sync dist/ "s3://$S3_BUCKET/" \
+aws s3 sync "$DIST_FOLDER/" "s3://$S3_BUCKET/" \
     --exclude "*" \
     --include "*.html" \
     --cache-control "public,max-age=300"
