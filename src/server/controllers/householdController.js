@@ -4,6 +4,7 @@
  */
 
 const householdService = require('../services/householdService');
+const { logger } = require('../log/logger');
 
 /**
  * Get all households
@@ -18,7 +19,7 @@ async function getAllHouseholds(req, res) {
       count: households.length
     });
   } catch (error) {
-    console.error('Error getting all households:', error);
+    logger.error('Error getting all households:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve households',
@@ -49,7 +50,7 @@ async function getHouseholdById(req, res) {
       data: household
     });
   } catch (error) {
-    console.error('Error getting household by ID:', error);
+    logger.error('Error getting household by ID:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve household',
@@ -73,7 +74,7 @@ async function getHouseholdsByOwnerId(req, res) {
       count: households.length
     });
   } catch (error) {
-    console.error('Error getting households by owner:', error);
+    logger.error('Error getting households by owner:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve households',
@@ -110,7 +111,7 @@ function createHousehold(req, res) {
       message: 'Household created successfully'
     });
   } catch (error) {
-    console.error('Error creating household:', error);
+    logger.error('Error creating household:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to create household',
@@ -144,7 +145,7 @@ async function updateHousehold(req, res) {
       message: 'Household updated successfully'
     });
   } catch (error) {
-    console.error('Error updating household:', error);
+    logger.error('Error updating household:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to update household',
@@ -175,7 +176,7 @@ async function deleteHousehold(req, res) {
       message: 'Household deleted successfully'
     });
   } catch (error) {
-    console.error('Error deleting household:', error);
+    logger.error('Error deleting household:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to delete household',

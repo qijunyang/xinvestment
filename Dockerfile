@@ -26,13 +26,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY package*.json ./
 
 # Copy server code
-COPY src/app.js ./src/
-COPY src/init.js ./src/
-COPY src/config ./src/config
-COPY src/controllers ./src/controllers
-COPY src/middleware ./src/middleware
-COPY src/routes ./src/routes
-COPY src/services ./src/services
+COPY src/server ./src/server
 
 # Copy public assets
 COPY public ./public
@@ -57,4 +51,4 @@ RUN ls -la /app \
     && test -d /app/node_modules/express
 
 # Start application
-CMD ["node", "src/app.js"]
+CMD ["node", "src/server/app.js"]

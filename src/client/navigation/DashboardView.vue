@@ -27,23 +27,7 @@ export default {
       username: 'User'
     };
   },
-  mounted() {
-    this.fetchCurrentUser();
-  },
   methods: {
-    async fetchCurrentUser() {
-      try {
-        const response = await axios.get('/api/auth/me', {
-          withCredentials: true
-        });
-        const data = response.data;
-        if (data.user) {
-          this.username = data.user.username;
-        }
-      } catch (error) {
-        console.error('Error fetching user:', error);
-      }
-    },
     async handleLogout() {
       try {
         await axios.get('/api/auth/logout', {

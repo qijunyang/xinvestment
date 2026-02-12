@@ -3,7 +3,7 @@
  * Tests configuration loading and merging logic
  */
 
-const { loadConfig } = require('../../src/config/configLoader');
+const { loadConfig } = require('../../../src/server/config/configLoader');
 
 describe('ConfigLoader', () => {
   describe('loadConfig', () => {

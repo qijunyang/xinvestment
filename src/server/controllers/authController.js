@@ -88,9 +88,28 @@ function getCurrentUser(req, res) {
   });
 }
 
+/**
+ * Public auth status endpoint
+ */
+function getAuthStatus(req, res) {
+  if (!req.session || !req.session.userId) {
+    return res.status(200).json({ authenticated: false });
+  }
+
+  return res.status(200).json({
+    authenticated: true,
+    user: {
+      userId: req.session.userId,
+      username: req.session.username,
+      loginTime: req.session.loginTime
+    }
+  });
+}
+
 module.exports = {
   login,
   logout,
-  getCurrentUser
+  getCurrentUser,
+  getAuthStatus
 };
 

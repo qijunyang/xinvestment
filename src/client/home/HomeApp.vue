@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import authService from '../data/authService';
 import AppLayout from '../navigation/AppLayout.vue';
 import DashboardView from '../navigation/DashboardView.vue';
 import HealthCheckView from '../navigation/HealthCheckView.vue';
@@ -38,33 +38,22 @@ export default {
       return components[this.currentPage] || 'DashboardView';
     }
   },
-  mounted() {
-    this.checkAuthentication();
-  },
   methods: {
-    async checkAuthentication() {
-      try {
-        const response = await axios.get('/api/auth/me', {
-          withCredentials: true
-        });
-
-        if (!response.ok && response.status !== 200) {
-          window.location.href = '/login/index.html';
-          return;
-        }
-      } catch (error) {
-        console.error('Error checking authentication:', error);
-        window.location.href = '/login/index.html';
-      } finally {
-        this.isLoading = false;
-      }
-    },
     onPageChange(page) {
       this.currentPage = page;
     },
     navigateTo(page) {
       this.currentPage = page;
+    },
+    async checkAuthStatus() {
+      const isAuthenticated = await authService.ensureAuthenticated('/login');
+      if (isAuthenticated) {
+        this.isLoading = false;
+      }
     }
+  },
+  async beforeMount() {
+    await this.checkAuthStatus();
   }
 };
 </script>

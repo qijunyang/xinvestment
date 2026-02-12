@@ -4,6 +4,7 @@
  */
 
 const userFeaturesService = require('../services/userFeaturesService');
+const { logger } = require('../log/logger');
 
 exports.getAllFeatures = async (req, res) => {
   try {
@@ -15,7 +16,7 @@ exports.getAllFeatures = async (req, res) => {
       message: 'Features retrieved successfully'
     });
   } catch (error) {
-    console.error('Error retrieving features:', error);
+    logger.error('Error retrieving features:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve features',
@@ -27,13 +28,6 @@ exports.getAllFeatures = async (req, res) => {
 exports.getUserFeatures = async (req, res) => {
   try {
     const userId = req.user?.userId || req.session?.userId;
-    
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        message: 'User not authenticated'
-      });
-    }
 
     const features = userFeaturesService.getUserFeatures(userId);
     
@@ -44,7 +38,7 @@ exports.getUserFeatures = async (req, res) => {
       message: 'User features retrieved successfully'
     });
   } catch (error) {
-    console.error('Error retrieving user features:', error);
+    logger.error('Error retrieving user features:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve user features',
@@ -79,7 +73,7 @@ exports.getFeatureById = async (req, res) => {
       message: 'Feature retrieved successfully'
     });
   } catch (error) {
-    console.error('Error retrieving feature:', error);
+    logger.error('Error retrieving feature:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve feature',

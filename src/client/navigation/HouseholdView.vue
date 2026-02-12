@@ -245,7 +245,6 @@ export default {
   data() {
     return {
       username: 'User',
-      currentUserId: '',
       households: [],
       isLoading: true,
       error: null,
@@ -267,24 +266,9 @@ export default {
     };
   },
   mounted() {
-    this.fetchCurrentUser();
     this.fetchHouseholds();
   },
   methods: {
-    async fetchCurrentUser() {
-      try {
-        const response = await axios.get('/api/auth/me', {
-          withCredentials: true
-        });
-        const data = response.data;
-        if (data.user) {
-          this.username = data.user.username;
-          this.currentUserId = data.user.userId || '';
-        }
-      } catch (error) {
-        console.error('Error fetching user:', error);
-      }
-    },
     async fetchHouseholds() {
       this.isLoading = true;
       this.error = null;
@@ -398,9 +382,9 @@ export default {
         this.addNotification('Please fill in all required fields', 'error');
         return;
       }
-      const ownerId = this.formData.ownerId || this.currentUserId;
+      const ownerId = this.formData.ownerId;
       if (!ownerId) {
-        this.addNotification('Missing owner ID. Please re-login and try again.', 'error');
+        this.addNotification('Missing owner ID. Please provide owner ID.', 'error');
         return;
       }
 

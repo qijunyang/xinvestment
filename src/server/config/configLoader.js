@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { logger } = require('../log/logger');
 
 // AWS Parameter Store integration - Currently disabled, will be added in future update
 // To enable AWS support:
@@ -72,8 +73,8 @@ async function replaceTokens(config, env) {
   const hasTokens = tokenPattern.test(configStr);
   
   if (hasTokens) {
-    console.log('⚠ Tokens found in config, but AWS Parameter Store is currently disabled');
-    console.log('To enable AWS support, uncomment code in configLoader.js and install aws-sdk');
+    logger.warn('⚠ Tokens found in config, but AWS Parameter Store is currently disabled');
+    logger.warn('To enable AWS support, uncomment code in configLoader.js and install aws-sdk');
   }
   
   return config;
@@ -120,23 +121,23 @@ async function replaceTokens(config, env) {
  */
 async function loadConfig(env) {
   try {
-    console.log(`Loading configuration for environment: ${env}`);
+    logger.info(`Loading configuration for environment: ${env}`);
     
     // Step 1: Load default config
     const defaultConfigPath = path.join(__dirname, 'config-default.js');
     delete require.cache[require.resolve(defaultConfigPath)];
     const defaultConfig = require(defaultConfigPath);
-    console.log('✓ Default config loaded');
+    logger.info('✓ Default config loaded');
     
     // Step 2: Load environment-specific config
     const envConfigPath = path.join(__dirname, `config-${env}.js`);
     delete require.cache[require.resolve(envConfigPath)];
     const envConfig = require(envConfigPath);
-    console.log(`✓ Environment config (${env}) loaded`);
+    logger.info(`✓ Environment config (${env}) loaded`);
     
     // Step 3: Merge configs (env-specific overrides defaults)
     const config = deepMerge(defaultConfig, envConfig);
-    console.log('✓ Configs merged (environment-specific overrides defaults)');
+    logger.info('✓ Configs merged (environment-specific overrides defaults)');
     
     // Step 4: Token replacement from AWS Parameter Store is currently disabled
     // AWS support can be re-enabled by uncommenting code in this file and installing aws-sdk
@@ -144,7 +145,7 @@ async function loadConfig(env) {
     
     return config;
   } catch (error) {
-    console.error('✗ Failed to load configuration:', error.message);
+    logger.error('✗ Failed to load configuration:', error.message);
     throw error;
   }
 }

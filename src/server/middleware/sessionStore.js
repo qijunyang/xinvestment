@@ -1,4 +1,5 @@
 const session = require('express-session');
+const { logger } = require('../log/logger');
 
 /**
  * In-memory session store compatible with express-session
@@ -150,7 +151,7 @@ class MemorySessionStore extends session.Store {
     });
 
     if (expiredSessions.length > 0) {
-      console.log(`[SessionStore] Cleaned up ${expiredSessions.length} expired sessions`);
+      logger.info(`[SessionStore] Cleaned up ${expiredSessions.length} expired sessions`);
     }
   }
 

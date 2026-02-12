@@ -3,7 +3,7 @@
  * Tests in-memory session store operations
  */
 
-const sessionStore = require('../../src/middleware/sessionStore');
+const sessionStore = require('../../../src/server/middleware/sessionStore');
 
 describe('SessionStore', () => {
   let store;

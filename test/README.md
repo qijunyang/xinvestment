@@ -23,7 +23,7 @@ Generates a coverage report showing which parts of the code are tested.
 
 ## Test Structure
 
-Tests are organized by module:
+Tests mirror the backend structure under `src/server`:
 
 - **configLoader.test.js** - Tests for configuration loading and merging
   - Loading default config
@@ -65,7 +65,7 @@ Jest is configured in `package.json` with:
 
 ## Adding New Tests
 
-1. Create a new file: `test/moduleName.test.js`
+1. Create a new file under `test/server/...` (matching `src/server/...`)
 2. Use the existing test structure as a reference
 3. Run `npm test` to verify
 
@@ -77,7 +77,7 @@ Jest is configured in `package.json` with:
  * Tests [what functionality]
  */
 
-const moduleToTest = require('../src/path/to/module');
+const moduleToTest = require('../../../src/server/path/to/module');
 
 describe('ModuleName', () => {
   it('should do something specific', () => {

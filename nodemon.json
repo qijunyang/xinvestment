@@ -2,7 +2,7 @@
   "watch": ["src"],
   "ignore": ["src/**/*.test.js"],
   "ext": "js",
-  "exec": "node src/app.js",
+  "exec": "node src/server/app.js",
   "env": {
     "NODE_ENV": "dev"
   }

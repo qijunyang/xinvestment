@@ -1,4 +1,5 @@
 const { loadConfig } = require('./config/configLoader');
+const { logger } = require('./log/logger');
 
 /**
  * Initialize application with loaded configuration
@@ -11,12 +12,12 @@ async function initializeApp(env) {
   const environment = String(rawEnv).toLowerCase();
   
   try {
-    console.log('🚀 Initializing application...');
+    logger.info('🚀 Initializing application...');
     const config = await loadConfig(environment);
-    console.log('✓ Application configuration loaded successfully');
+    logger.info('✓ Application configuration loaded successfully');
     return config;
   } catch (error) {
-    console.error('✗ Application initialization failed:', error.message);
+    logger.error('✗ Application initialization failed:', error.message);
     process.exit(1); // Exit if config cannot be loaded
   }
 }

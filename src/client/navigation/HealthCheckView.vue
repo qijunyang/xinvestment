@@ -61,23 +61,9 @@ export default {
     };
   },
   mounted() {
-    this.fetchCurrentUser();
     this.checkHealth();
   },
   methods: {
-    async fetchCurrentUser() {
-      try {
-        const response = await axios.get('/api/auth/me', {
-          withCredentials: true
-        });
-        const data = response.data;
-        if (data.user) {
-          this.username = data.user.username;
-        }
-      } catch (error) {
-        console.error('Error fetching user:', error);
-      }
-    },
     async checkHealth() {
       this.isLoading = true;
       this.error = null;

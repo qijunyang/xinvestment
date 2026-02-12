@@ -66,25 +66,7 @@ export default {
       success: ''
     };
   },
-  mounted() {
-    this.checkAuthentication();
-  },
   methods: {
-    async checkAuthentication() {
-      try {
-        const response = await fetch('/api/auth/me', {
-          credentials: 'include'
-        });
-
-        // If authenticated, redirect to home
-        if (response.ok) {
-          window.location.href = '/home/index.html';
-        }
-      } catch (error) {
-        // If there's an error, allow user to see login page
-        console.error('Auth check error:', error);
-      }
-    },
     async handleLogin() {
       this.error = '';
       this.success = '';

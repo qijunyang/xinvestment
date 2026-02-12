@@ -1,5 +1,6 @@
 const session = require('express-session');
 const sessionStore = require('./sessionStore');
+const { logger } = require('../log/logger');
 
 /**
  * Session middleware using express-session
@@ -44,15 +45,15 @@ function sessionMiddleware(config) {
       store = new MemcachedStore({ client: memcachedClient });
       
       const discoveryMsg = memcachedConfig.autoDiscovery ? ' (with AWS auto-discovery)' : '';
-      console.log(`[SessionMiddleware] Using AWS ElastiCache memcached store: ${memcachedConfig.host}:${memcachedConfig.port}${discoveryMsg}`);
+      logger.info(`[SessionMiddleware] Using AWS ElastiCache memcached store: ${memcachedConfig.host}:${memcachedConfig.port}${discoveryMsg}`);
     } catch (err) {
-      console.warn('[SessionMiddleware] ElastiCache memcached not available, falling back to memory store:', err.message);
+      logger.warn('[SessionMiddleware] ElastiCache memcached not available, falling back to memory store:', err.message);
       store = sessionStore.getStore();
     }
   } else {
     // Use in-memory store for development
     store = sessionStore.getStore();
-    console.log('[SessionMiddleware] Using in-memory session store');
+    logger.info('[SessionMiddleware] Using in-memory session store');
   }
   
   const sessionConfig = session({
