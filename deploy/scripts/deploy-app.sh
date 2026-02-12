@@ -44,6 +44,11 @@ VAR_FILE="$TERRAFORM_DIR/terraform-$ENVIRONMENT.tfvars"
 info "App deploy pipeline starting for environment: $ENVIRONMENT"
 echo ""
 
+# Step 0: Run unit tests
+info "Step 0: Run unit tests"
+cd "$PROJECT_ROOT"
+npm test
+
 # Step 1: Build and push API image
 info "Step 1: Build and push API image"
 if [ -z "$IMAGE_TAG" ]; then

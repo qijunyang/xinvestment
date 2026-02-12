@@ -113,6 +113,17 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Info "Docker image built successfully"
 
+# Security scan Docker image
+Write-Info "Running security scan on Docker image..."
+docker scan --severity high "xinvestment:$ImageTag"
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error-Custom "Docker image security scan failed"
+    exit $LASTEXITCODE
+}
+
+Write-Info "Docker image security scan passed"
+
 # Tag image for ECR
 Write-Info "Tagging image for ECR..."
 docker tag "xinvestment:$ImageTag" "${EcrRepo}:$ImageTag"

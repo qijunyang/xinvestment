@@ -94,6 +94,17 @@ fi
 
 info "Docker image built successfully"
 
+# Security scan Docker image
+info "Running security scan on Docker image..."
+docker scan --severity high xinvestment:${IMAGE_TAG}
+
+if [ $? -ne 0 ]; then
+    error "Docker image security scan failed"
+    exit 1
+fi
+
+info "Docker image security scan passed"
+
 # Tag image for ECR
 info "Tagging image for ECR..."
 docker tag xinvestment:${IMAGE_TAG} ${ECR_REPO}:${IMAGE_TAG}

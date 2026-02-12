@@ -46,6 +46,15 @@ $VarFile = "$TerraformDir\terraform-$Environment.tfvars"
 Write-Info "App deploy pipeline starting for environment: $Environment"
 Write-Host ""
 
+# Step 0: Run unit tests
+Write-Info "Step 0: Run unit tests"
+Set-Location $ProjectRoot
+npm test
+if ($LASTEXITCODE -ne 0) {
+    Write-Error-Custom "Unit tests failed"
+    exit $LASTEXITCODE
+}
+
 # Step 1: Build and push API image
 Write-Info "Step 1: Build and push API image"
 if ([string]::IsNullOrEmpty($ImageTag)) {
