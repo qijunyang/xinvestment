@@ -10,7 +10,7 @@ describe('ConfigLoader', () => {
     it('should load default config for dev environment', async () => {
       const config = await loadConfig('dev');
       expect(config).toBeDefined();
-      expect(config.env).toBe('dev');
+      expect(config.env).toEqual({ app_env: 'dev' });
       expect(config.port).toBeDefined();
       expect(config.sessionSecret).toBeDefined();
     });
@@ -18,7 +18,7 @@ describe('ConfigLoader', () => {
     it('should load environment-specific config', async () => {
       const config = await loadConfig('qa');
       expect(config).toBeDefined();
-      expect(config.env).toBe('qa');
+      expect(config.env).toEqual({ app_env: 'qa' });
     });
 
     it('should merge default and environment configs', async () => {
@@ -30,8 +30,8 @@ describe('ConfigLoader', () => {
       expect(qaConfig.port).toBeDefined();
       
       // Environment-specific values should differ or be present
-      expect(devConfig.env).toBe('dev');
-      expect(qaConfig.env).toBe('qa');
+      expect(devConfig.env).toEqual({ app_env: 'dev' });
+      expect(qaConfig.env).toEqual({ app_env: 'qa' });
     });
 
     it('should include session store configuration', async () => {

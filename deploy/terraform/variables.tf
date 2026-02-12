@@ -63,7 +63,7 @@ variable "fargate_memory" {
 variable "desired_count" {
   description = "Desired number of ECS tasks"
   type        = number
-  default     = 1
+  default     = 0
 }
 
 variable "min_capacity" {

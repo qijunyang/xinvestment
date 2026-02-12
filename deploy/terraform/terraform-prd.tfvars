@@ -14,7 +14,7 @@ subject_alternative_names = ["www.xinvestment.example.com"]
 # ECS Configuration
 fargate_cpu    = "1024"  # 1 vCPU
 fargate_memory = "2048"  # 2 GB
-desired_count  = 1
+desired_count  = 0
 min_capacity   = 1
 max_capacity   = 1
 

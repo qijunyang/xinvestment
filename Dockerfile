@@ -34,16 +34,8 @@ COPY src/middleware ./src/middleware
 COPY src/routes ./src/routes
 COPY src/services ./src/services
 
-# Copy pre-built client bundles
-COPY src/client/dist ./src/client/dist
-
-# Copy remaining client files
-COPY src/client/home/index.html ./src/client/home/
-COPY src/client/login/index.html ./src/client/login/
-COPY src/client/login/style.css ./src/client/login/
-COPY src/client/navigation ./src/client/navigation
-COPY src/client/data ./src/client/data
-COPY src/client/components ./src/client/components
+# Copy public assets
+COPY public ./public
 
 # Create a non-root user
 RUN addgroup -g 1001 -S nodejs && \

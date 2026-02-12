@@ -59,8 +59,8 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-# Step 2: Force ECS service deployment to pull latest image
-Write-Info "Step 2: Update ECS service to use latest image"
+# Step 2: Force ECS service deployment to pull latest image and set desired count
+Write-Info "Step 2: Update ECS service to use latest image and set desired count to 1"
 if (-not (Test-Path $BackendConfig)) {
     Write-Error-Custom "Backend config not found: $BackendConfig"
     exit 1
@@ -92,16 +92,22 @@ if ([string]::IsNullOrEmpty($ClusterName) -or [string]::IsNullOrEmpty($ServiceNa
     exit 1
 }
 
-aws ecs update-service --cluster $ClusterName --service $ServiceName --force-new-deployment --region $AwsRegion | Out-Null
+aws ecs update-service --cluster $ClusterName --service $ServiceName --force-new-deployment --desired-count 1 --region $AwsRegion | Out-Null
 if ($LASTEXITCODE -ne 0) {
     Write-Error-Custom "ECS service update failed"
     exit $LASTEXITCODE
 }
 
 # Step 3: Deploy static assets to S3/CloudFront
-Write-Info "Step 3: Deploy static assets to S3/CloudFront"
+Write-Info "Step 3: Deploy static assets to S3/CloudFront (public/dist)"
 Set-Location $ProjectRoot
-npm run build
+
+$BuildScript = "build"
+if ($Environment -in @('dev','qa','stg','uat')) {
+    $BuildScript = "build:dev"
+}
+
+npm run $BuildScript
 if ($LASTEXITCODE -ne 0) {
     Write-Error-Custom "Frontend build failed"
     exit $LASTEXITCODE

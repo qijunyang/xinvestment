@@ -121,7 +121,8 @@ docker tag "xinvestment:$ImageTag" "${EcrRepo}:$BranchTag"
 # Login to ECR
 Write-Info "Logging in to ECR..."
 $EcrRegistry = $EcrRepo.Split('/')[0]
-aws ecr get-login-password --region $AwsRegion | docker login --username AWS --password-stdin $EcrRegistry
+$EcrToken = (aws ecr get-login-password --region $AwsRegion).Trim()
+docker login --username AWS --password $EcrToken $EcrRegistry
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error-Custom "ECR login failed"

@@ -24,7 +24,8 @@ pnpm-lock.yaml
 # Build and dist
 dist/
 build/
-src/client/dist/
+public/dist/
+public/
 
 # Logs
 logs/
@@ -51,3 +52,5 @@ e2e/test-results/
 e2e/playwright-report/
 e2e/playwright/.cache/
 e2e/.env.test
+test-results/
+playwright-report/

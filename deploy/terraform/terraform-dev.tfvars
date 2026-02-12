@@ -16,7 +16,7 @@ subject_alternative_names = []
 fargate_cpu    = "256"   # 0.25 vCPU
 fargate_memory = "512"   # 0.5 GB
 desired_count  = 0
-min_capacity   = 0
+min_capacity   = 1
 max_capacity   = 1
 
 # ECR Configuration (replace with actual ECR URL)

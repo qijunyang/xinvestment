@@ -62,6 +62,33 @@ data "aws_cloudfront_origin_request_policy" "all_viewer" {
   name     = "Managed-AllViewer"
 }
 
+resource "aws_cloudfront_function" "static_rewrite" {
+  provider = aws.frontend
+  name     = "${var.project_name}-${var.environment}-static-rewrite"
+  runtime  = "cloudfront-js-1.0"
+  comment  = "Rewrite friendly paths to index.html"
+  publish  = true
+
+  code = <<-EOF
+function handler(event) {
+  var request = event.request;
+  var uri = request.uri;
+
+  if (uri === '/home' || uri === '/home/') {
+    request.uri = '/home/index.html';
+    return request;
+  }
+
+  if (uri === '/login' || uri === '/login/') {
+    request.uri = '/login/index.html';
+    return request;
+  }
+
+  return request;
+}
+EOF
+}
+
 resource "aws_cloudfront_distribution" "static_assets" {
   provider            = aws.frontend
   enabled             = true
@@ -94,6 +121,11 @@ resource "aws_cloudfront_distribution" "static_assets" {
     target_origin_id       = "S3-${aws_s3_bucket.static_assets.id}"
     viewer_protocol_policy = "redirect-to-https"
     compress               = true
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.static_rewrite.arn
+    }
 
     cache_policy_id          = data.aws_cloudfront_cache_policy.optimized.id
     origin_request_policy_id = data.aws_cloudfront_origin_request_policy.cors_s3.id

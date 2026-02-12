@@ -14,7 +14,7 @@ subject_alternative_names = []
 # ECS Configuration
 fargate_cpu    = "512"   # 0.5 vCPU
 fargate_memory = "1024"  # 1 GB
-desired_count  = 1
+desired_count  = 0
 min_capacity   = 1
 max_capacity   = 1
 

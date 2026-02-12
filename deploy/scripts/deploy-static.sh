@@ -46,10 +46,30 @@ info "Deploying static assets for environment: $ENVIRONMENT"
 # Change to project root
 cd "$(dirname "$0")/../.."
 
-# Check if dist folder exists (webpack outputs to src/client/dist)
-DIST_FOLDER="src/client/dist"
+# Build assets based on environment
+BUILD_SCRIPT="build"
+if [[ "$ENVIRONMENT" =~ ^(dev|qa|stg|uat)$ ]]; then
+    BUILD_SCRIPT="build:dev"
+fi
+
+info "Building frontend assets with npm run $BUILD_SCRIPT"
+npm run "$BUILD_SCRIPT"
+
+# Check if dist folder exists (webpack outputs to public/dist)
+DIST_FOLDER="public/dist"
 if [ ! -d "$DIST_FOLDER" ]; then
-    error "dist folder not found at $DIST_FOLDER. Please run 'npm run build' first."
+    error "dist folder not found at $DIST_FOLDER."
+    exit 1
+fi
+
+LOGIN_HTML="public/login/index.html"
+HOME_HTML="public/home/index.html"
+if [ ! -f "$LOGIN_HTML" ]; then
+    error "login index.html not found at $LOGIN_HTML"
+    exit 1
+fi
+if [ ! -f "$HOME_HTML" ]; then
+    error "home index.html not found at $HOME_HTML"
     exit 1
 fi
 
@@ -81,7 +101,7 @@ cd ../..
 
 # Sync dist folder to S3
 info "Uploading static assets to S3..."
-aws s3 sync "$DIST_FOLDER/" "s3://$S3_BUCKET/" \
+aws s3 sync "$DIST_FOLDER/" "s3://$S3_BUCKET/dist/" \
     --delete \
     --cache-control "public,max-age=31536000,immutable" \
     --exclude "*.html" \
@@ -94,15 +114,20 @@ fi
 
 # Upload HTML files with shorter cache duration
 info "Uploading HTML files with shorter cache..."
-aws s3 sync "$DIST_FOLDER/" "s3://$S3_BUCKET/" \
-    --exclude "*" \
-    --include "*.html" \
+aws s3 cp "$LOGIN_HTML" "s3://$S3_BUCKET/login/index.html" \
     --cache-control "public,max-age=300"
-
 if [ $? -ne 0 ]; then
-    error "Failed to upload HTML files to S3"
+    error "Failed to upload login/index.html to S3"
     exit 1
 fi
+
+aws s3 cp "$HOME_HTML" "s3://$S3_BUCKET/home/index.html" \
+    --cache-control "public,max-age=300"
+if [ $? -ne 0 ]; then
+    error "Failed to upload home/index.html to S3"
+    exit 1
+fi
+
 
 info "Static assets uploaded successfully!"
 

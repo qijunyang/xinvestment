@@ -49,12 +49,12 @@ export default {
         });
 
         if (!response.ok && response.status !== 200) {
-          window.location.href = '/login';
+          window.location.href = '/login/index.html';
           return;
         }
       } catch (error) {
         console.error('Error checking authentication:', error);
-        window.location.href = '/login';
+        window.location.href = '/login/index.html';
       } finally {
         this.isLoading = false;
       }

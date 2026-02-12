@@ -11,17 +11,6 @@ resource "aws_security_group" "alb" {
     prefix_list_ids = [var.cloudfront_prefix_list_id]
   }
 
-  dynamic "ingress" {
-    for_each = var.environment == "dev" ? [1] : []
-    content {
-      description = "HTTP from anywhere (dev only)"
-      from_port   = 80
-      to_port     = 80
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-  }
-
   egress {
     description = "Allow all outbound"
     from_port   = 0

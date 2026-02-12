@@ -39,11 +39,35 @@ if (-not (Test-Path "$DeployDir\terraform")) {
     exit 1
 }
 
-# Check if dist folder exists (webpack outputs to src/client/dist)
-$DistFolder = "$ProjectRoot\src\client\dist"
+# Build assets based on environment
+Set-Location $ProjectRoot
+$BuildScript = "build"
+if ($Environment -in @('dev','qa','stg','uat')) {
+    $BuildScript = "build:dev"
+}
+
+Write-Info "Building frontend assets with npm run $BuildScript"
+npm run $BuildScript
+if ($LASTEXITCODE -ne 0) {
+    Write-Error-Custom "Frontend build failed"
+    exit $LASTEXITCODE
+}
+
+# Check if dist folder exists (webpack outputs to public/dist)
+$DistFolder = "$ProjectRoot\public\dist"
 if (-not (Test-Path $DistFolder)) {
     Write-Error-Custom "dist folder not found at: $DistFolder"
-    Write-Error-Custom "Please run 'npm run build' from project root first."
+    exit 1
+}
+
+$LoginHtml = "$ProjectRoot\public\login\index.html"
+$HomeHtml = "$ProjectRoot\public\home\index.html"
+if (-not (Test-Path $LoginHtml)) {
+    Write-Error-Custom "login index.html not found at: $LoginHtml"
+    exit 1
+}
+if (-not (Test-Path $HomeHtml)) {
+    Write-Error-Custom "home index.html not found at: $HomeHtml"
     exit 1
 }
 
@@ -77,7 +101,7 @@ Set-Location $ProjectRoot
 
 # Sync dist folder to S3
 Write-Info "Uploading static assets to S3..."
-aws s3 sync "$DistFolder/" "s3://$S3Bucket/" `
+aws s3 sync "$DistFolder/" "s3://$S3Bucket/dist/" `
     --delete `
     --cache-control "public,max-age=31536000,immutable" `
     --exclude "*.html" `
@@ -90,15 +114,20 @@ if ($LASTEXITCODE -ne 0) {
 
 # Upload HTML files with shorter cache duration
 Write-Info "Uploading HTML files with shorter cache..."
-aws s3 sync "$DistFolder/" "s3://$S3Bucket/" `
-    --exclude "*" `
-    --include "*.html" `
+aws s3 cp "$LoginHtml" "s3://$S3Bucket/login/index.html" `
     --cache-control "public,max-age=300"
-
 if ($LASTEXITCODE -ne 0) {
-    Write-Error-Custom "Failed to upload HTML files to S3"
+    Write-Error-Custom "Failed to upload login/index.html to S3"
     exit 1
 }
+
+aws s3 cp "$HomeHtml" "s3://$S3Bucket/home/index.html" `
+    --cache-control "public,max-age=300"
+if ($LASTEXITCODE -ne 0) {
+    Write-Error-Custom "Failed to upload home/index.html to S3"
+    exit 1
+}
+
 
 Write-Info "Static assets uploaded successfully!"
 

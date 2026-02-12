@@ -12,8 +12,8 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from client folder
-app.use(express.static(path.join(__dirname, 'client')));
+// Serve static files from public
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Start server only after config is loaded
 async function startServer() {
@@ -40,16 +40,16 @@ async function startServer() {
 
     // Serve login page at root and /login
     app.get('/', (req, res) => {
-      res.sendFile(path.join(__dirname, 'client', 'login', 'index.html'));
+      res.sendFile(path.join(__dirname, '..', 'public', 'login', 'index.html'));
     });
 
     app.get('/login', (req, res) => {
-      res.sendFile(path.join(__dirname, 'client', 'login', 'index.html'));
+      res.sendFile(path.join(__dirname, '..', 'public', 'login', 'index.html'));
     });
 
     // Serve home page (protected - HomeApp.vue checks authentication)
     app.get('/home', (req, res) => {
-      res.sendFile(path.join(__dirname, 'client', 'home', 'index.html'));
+      res.sendFile(path.join(__dirname, '..', 'public', 'home', 'index.html'));
     });
 
     // Error handling middleware

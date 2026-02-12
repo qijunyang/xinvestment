@@ -52,8 +52,8 @@ else
     "$SCRIPT_DIR/deploy-image.sh" "$ENVIRONMENT" "$IMAGE_TAG"
 fi
 
-# Step 2: Force ECS service deployment to pull latest image
-info "Step 2: Update ECS service to use latest image"
+# Step 2: Force ECS service deployment to pull latest image and set desired count
+info "Step 2: Update ECS service to use latest image and set desired count to 1"
 if [ ! -f "$BACKEND_CONFIG" ]; then
     error "Backend config not found: $BACKEND_CONFIG"
     exit 1
@@ -80,12 +80,17 @@ if [ -z "$CLUSTER_NAME" ] || [ -z "$SERVICE_NAME" ]; then
     exit 1
 fi
 
-aws ecs update-service --cluster "$CLUSTER_NAME" --service "$SERVICE_NAME" --force-new-deployment --region "$AWS_REGION" >/dev/null
+aws ecs update-service --cluster "$CLUSTER_NAME" --service "$SERVICE_NAME" --force-new-deployment --desired-count 1 --region "$AWS_REGION" >/dev/null
 
 # Step 3: Deploy static assets to S3/CloudFront
-info "Step 3: Deploy static assets to S3/CloudFront"
+info "Step 3: Deploy static assets to S3/CloudFront (public/dist)"
 cd "$PROJECT_ROOT"
-npm run build
+BUILD_SCRIPT="build"
+if [[ "$ENVIRONMENT" =~ ^(dev|qa|stg|uat)$ ]]; then
+    BUILD_SCRIPT="build:dev"
+fi
+
+npm run "$BUILD_SCRIPT"
 "$SCRIPT_DIR/deploy-static.sh" "$ENVIRONMENT"
 
 echo ""

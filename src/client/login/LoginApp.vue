@@ -78,7 +78,7 @@ export default {
 
         // If authenticated, redirect to home
         if (response.ok) {
-          window.location.href = '/home';
+          window.location.href = '/home/index.html';
         }
       } catch (error) {
         // If there's an error, allow user to see login page
@@ -109,7 +109,7 @@ export default {
         if (response.ok) {
           this.success = 'Login successful! Redirecting...';
           setTimeout(() => {
-            window.location.href = '/home';
+            window.location.href = '/home/index.html';
           }, 1500);
         } else {
           this.error = data.message || 'Login failed';
